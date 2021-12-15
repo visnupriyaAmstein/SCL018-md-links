@@ -1,16 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const fetch = require('node-fetch');
+import { statSync, readdirSync, readFileSync } from 'fs';
+import { extname, join } from 'path';
+import fetch from 'node-fetch';
 // import fs from 'fs';
 // import path from 'path';
 // import fetch from 'node-fetch';
 
-//const dirRoute = 'README.md';
+const dirRoute = 'README.md';
 
 // Función solo si  es folder 
 const funcIsDirectory = (dirRoute) => {
   try {
-      const stats = fs.statSync(dirRoute);//devuelve informacion sincronicamente sobre la ruta 
+      const stats = statSync(dirRoute);//devuelve informacion sincronicamente sobre la ruta 
       return stats.isDirectory();
   } catch (e) {
       throw new Error('not a valid directory ' + dirRoute); // new Error prints callstack
@@ -19,7 +19,7 @@ const funcIsDirectory = (dirRoute) => {
 
 // Función solo si es un documento 
 const funcIsMdFile = (filesRoute) => {
-    const extName = path.extname(filesRoute);//devuelve la extensión de la ruta de archivo despues del .
+    const extName = extname(filesRoute);//devuelve la extensión de la ruta de archivo despues del .
     if (extName === '.md') {  // compara la ruta con md
         return true;
     } else {
@@ -29,9 +29,9 @@ const funcIsMdFile = (filesRoute) => {
 
 // Función para poder leer un folder
 const funcReadDir = (folder, mdLinks) => {
-    files = fs.readdirSync(folder);//lee el archivo y devuelve la matriz  con los nombres 
+    files = readdirSync(folder);//lee el archivo y devuelve la matriz  con los nombres 
     files.forEach(file => {
-    const fullPath = path.join(folder, file);// une la ruta
+    const fullPath = join(folder, file);// une la ruta
     if (funcIsDirectory(fullPath)) {
         funcReadDir(fullPath, mdLinks);
     } else if (funcIsMdFile(fullPath)) {
@@ -42,34 +42,10 @@ const funcReadDir = (folder, mdLinks) => {
 
 // Función para leer un documento 
 const funcReadFile = (files, mdLinks) => {
-    const file = fs.readFileSync(files, 'utf8');//lee el archivo y lo devuelve 
+    const file = readFileSync(files, 'utf8');//lee el archivo y lo devuelve 
     mdLinks.push(...linksMd(file, files)); // spread operator
 };
 
-//Función para almacenar links 
-// const linksMd = (file, filePath) => {
-//     const line = file.split('\n'); // separa en lineas el documento 
-//     const arrayLinks = [];
-//     for (const i=0; line.length > i; i++){
-//         const lineI = line[i];
-//         const reguExpress = /\[([^\]]+)]\((https?:\/\/[^\s)]+)\)/gi // expresión regular que muestra el texto y los links 
-//         const matchLinks = lineI.matchAll(reguExpress); // busca coincidencias 
-//         const testMatch = reguExpress.test(lineI); // true o false 
-
-//         if(testMatch) {
-//             for(const match of matchLinks) {
-//                 const objMd = {
-//                     href = match[2],
-//                     text = match[1],
-//                     file = filePath,
-                    
-//                 };
-//                 console.log(match[2]);
-//           };
-//         };
-//         console.log(lineI)
-//     }
-// }
 const linksMd = (file, files) => {
   const line = file.split('\n');// separa en lineas el documento 
   let arrayLinks = [];
@@ -90,6 +66,7 @@ const linksMd = (file, files) => {
     } 
   }return arrayLinks;
 };
+const totalLinks = [];
 
 const funcDirOrFile = (routeTotal, totalLinks) => {
   if(funcIsDirectory ( routeTotal)) {
@@ -98,6 +75,43 @@ const funcDirOrFile = (routeTotal, totalLinks) => {
     funcReadFile(routeTotal, totalLinks);
   }
 };
+funcDirOrFile('pruebas2.md',totalLinks);
+console.log(totalLinks);
 
 
-  
+//pathDelUser = process.argv[2]
+
+let arrayLinks = 'pruebas2.md'
+const validateOpt = (arrayLinks) => {
+  const statusLink = arrayLinks.map((obj) =>
+    fetch(obj.href)
+    .then((res) => {
+      if (res.status === 200) {
+        return {
+          href: obj.href,
+          text: obj.text,
+          file: obj.file,
+          status: res.status,
+          statusText: 'ok',
+        };
+      } else {
+        return {
+          href: obj.href,
+          text: obj.text,
+          file: obj.file,
+          status: res.status,
+          statusText: 'Fail',
+        };
+      }
+    })
+    .catch((err) =>
+      ({
+        href: obj.href,
+        text: obj.text,
+        file: obj.file,
+        status: 404,
+        statusText: 'Fail',
+      }),
+    ));
+  return Promise.all(statusLink);
+};
