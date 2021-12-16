@@ -1,16 +1,18 @@
-import { statSync, readdirSync, readFileSync } from 'fs';
-import { extname, join } from 'path';
+// import { statSync, readdirSync, readFileSync } from 'fs';
+// import { extname, join } from 'path';
 import fetch from 'node-fetch';
-// import fs from 'fs';
-// import path from 'path';
-// import fetch from 'node-fetch';
+import path from 'path';
+import fs from 'fs';
 
-var dirRoute = 'README.md';
+// const ejemplo ='C:\Users\Visnupriya Amstein\Documents\laboratoria\SCL018-md-links\pruebas2.md';
+// const ejemplo1 =('Documents/ProyectosLaboratoria/SCL018-md-link');
+// console.log("example" ,ejemplo); //true
+// console.log("example" ,ejemplo1); // false
 
 // Función solo si  es folder 
-const funcIsDirectory = (dirRoute) => {
+const funcIsFolder = (dirRoute) => {
   try {
-      const stats = statSync(dirRoute);//devuelve informacion sincronicamente sobre la ruta 
+      const stats = fs.statSync(dirRoute);//devuelve informacion sincronicamente sobre la ruta 
       return stats.isDirectory();
   } catch (e) {
       throw new Error('not a valid directory ' + dirRoute); // new Error prints callstack
@@ -19,7 +21,7 @@ const funcIsDirectory = (dirRoute) => {
 
 // Función solo si es un documento 
 const funcIsMdFile = (filesRoute) => {
-    const extName = extname(filesRoute);//devuelve la extensión de la ruta de archivo despues del .
+    const extName = path.extname(filesRoute);//devuelve la extensión de la ruta de archivo despues del .
     if (extName === '.md') {  // compara la ruta con md
         return true;
     } else {
@@ -28,25 +30,19 @@ const funcIsMdFile = (filesRoute) => {
 };
 
 // Función para poder leer un folder
-const funcReadDir = (folder, mdLinks) => {
-    files = readdirSync(folder);//lee el archivo y devuelve la matriz  con los nombres 
+const funcReadFolder = (folder, mdLinks) => {
+    const files = fs.readdirSync(folder);//lee el archivo y devuelve la matriz  con los nombres 
     files.forEach(file => {
-    const fullPath = join(folder, file);// une la ruta
-    if (funcIsDirectory(fullPath)) {
-        funcReadDir(fullPath, mdLinks);
+    const fullPath = path.join(folder, file);// une la ruta
+    if (funcIsFolder(fullPath)) {
+        funcReadFolder(fullPath, mdLinks);
     } else if (funcIsMdFile(fullPath)) {
         funcReadFile(fullPath, mdLinks);
     } 
     });
 };
 
-// Función para leer un documento 
-const funcReadFile = (files, mdLinks) => {
-    const file = readFileSync(files, 'utf8');//lee el archivo y lo devuelve 
-    mdLinks.push(...linksMd(file, files)); // spread operator
-};
-
-const linksMd = (file, files) => {
+export const linksMd = (file, files) => {
   const line = file.split('\n');// separa en lineas el documento 
   let arrayLinks = [];
   for ( let i=0; line.length > i; i++) { 
@@ -66,75 +62,70 @@ const linksMd = (file, files) => {
     } 
   }return arrayLinks;
 };
+
+// Función para leer un documento 
+const funcReadFile = (files, mdLinks) => {
+    const file = fs.readFileSync(files, 'utf8');//lee el archivo y lo devuelve 
+    mdLinks.push(...linksMd(file, files)); // spread operator
+};
+
 const totalLinks = [];
 
-const funcDirOrFile = (routeTotal, totalLinks) => {
-  if(funcIsDirectory ( routeTotal)) {
-    funcReadDir(routeTotal, totalLinks);
+const funcDirOMd = (routeTotal, totalLinks) => {
+  if(funcIsFolder ( routeTotal)) {
+    funcReadFolder(routeTotal, totalLinks);
   }else if(funcIsMdFile(routeTotal)) {
     funcReadFile(routeTotal, totalLinks);
   }
 };
-funcDirOrFile('pruebas2.md',totalLinks);
-console.log(totalLinks);
+
 
 
 //pathDelUser = process.argv[2]
 
- let links = 'https://es.wikipedia.org/wiki/Markdown';
+
 const validateOpt = (arrayLinks) => {
-    let statusLink = 
-    statusLink = arrayLinks.map((obj) =>
-
-    fetch(obj.href)
-    .then((res) => {
-      if (res.status === 200) {
-        return {
+    const statusLink = arrayLinks.map((obj) =>
+      fetch(obj.href)
+      .then((res) => {
+        if (res.status === 200) {
+          return {
+            href: obj.href,
+            text: obj.text,
+            file: obj.file,
+            status: res.status,
+            statusText: 'ok',
+          };
+        } else {
+          return {
+            href: obj.href,
+            text: obj.text,
+            file: obj.file,
+            status: res.status,
+            statusText: 'Fail',
+          };
+        }
+      })
+      .catch((err) =>
+        ({
           href: obj.href,
           text: obj.text,
           file: obj.file,
-          status: res.status,
-          statusText: 'ok',
-        };
-      } else {
-        return {
-          href: obj.href,
-          text: obj.text,
-          file: obj.file,
-          status: res.status,
+          status: 404,
           statusText: 'Fail',
-        };
-      }
-    })
-    .catch((err) =>
-      ({
-        href: obj.href,
-        text: obj.text,
-        file: obj.file,
-        status: 404,
-        statusText: 'Fail',
-      }),
-    ));
-  return Promise.all(statusLink);
-};
-validateOpt(statusLink)
-console.log(statusLink);
+        }),
+      ));
+    return Promise.all(statusLink);
+  };
+
+  funcDirOMd('./prueba',totalLinks);
+  // console.log(totalLinks);
+validateOpt(totalLinks)
+.then(result=>console.log(result))
+.catch(err=>console.log('This error corresponds to the validateOpt promise' + err))
+  
+
+//   validateOpt('pruebas2.md',totalLinks);
+//   console.log(totalLinks);
 
 
-// const validateLinks = (links) => {
-//     const validated = links.map((element) =>
-//     fetch(element.href)
-//     .then((response) => {
-//         return {
-//           href: element.href,
-//           text: element.text,
-//           file: element.file,
-//           status: response.status,
-//           statusText: response.statusText,
-//         };
-//     })
-//     )
-//     return Promise.all(validated);
-//   }
-// validateLinks(validated);
-// console.log(validated)
