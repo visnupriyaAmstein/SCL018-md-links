@@ -128,4 +128,19 @@ validateOpt(totalLinks)
 //   validateOpt('pruebas2.md',totalLinks);
 //   console.log(totalLinks);
 
-
+//   const mdLinks = (fullPath, options = { validate: false, stats: false}) => {
+//     return new Promise((resolve, reject) => {
+//     let totalMdLinks = [];
+//     funcDirOrFile(fullPath, totalMdLinks);
+//     if (totalMdLinks.length > 0) {
+//         if (!options.validate && options.stats) {
+//             resolve(validateArray(totalMdLinks))
+//         } else if (options.validate && !options.stats) {
+//             resolve(statsArray(totalMdLinks));
+//         } 
+//     }
+//     else {
+//         reject(new Error('couldn\'t find any link'));
+//     }
+// });
+// };
