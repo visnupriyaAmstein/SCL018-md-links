@@ -1,23 +1,19 @@
-// import fetch from 'node-fetch';
-// import path from 'path';
-// import fs from 'fs';
-const fs = require('fs');
-const path = require('path')
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
+import path from 'path';
+import fs from 'fs';
 
-
-// Función solo si  es folder 
-const isFolder = (dirRoute) => {
+// Función solo si  es folder
+export const isFolder = (dirRoute) => {
   try {
-      const stats = fs.statSync(dirRoute);//devuelve informacion sincronicamente sobre la ruta 
+      const stats = fs.statSync(dirRoute);//devuelve informacion sincronicamente sobre la ruta
       return stats.isDirectory();
   } catch (e) {
       throw new Error('not a valid directory ' + dirRoute); // new Error prints callstack
   }
 };
 
-// Función solo si es un documento 
-const isMdFile = (filesRoute) => {
+// Función solo si es un documento
+export const isMdFile = (filesRoute) => {
     const extName = path.extname(filesRoute);//devuelve la extensión de la ruta de archivo despues del .
     if (extName === '.md') {  // compara la ruta con md
         return true;
@@ -28,25 +24,25 @@ const isMdFile = (filesRoute) => {
 
 // Función para poder leer un folder
 const readFolder = (folder, mdLinks) => {
-    const files = fs.readdirSync(folder);//lee el archivo y devuelve la matriz  con los nombres 
+    const files = fs.readdirSync(folder);//lee el archivo y devuelve la matriz  con los nombres
     files.forEach(file => {
     const fullPath = path.join(folder, file);// une la ruta
     if (isFolder(fullPath)) {
         readFolder(fullPath, mdLinks);
     } else if (isMdFile(fullPath)) {
         readFile(fullPath, mdLinks);
-    } 
+    }
     });
 };
 
  const linksMd = (file, files) => {
-  const line = file.split('\n');// separa en lineas el documento 
+  const line = file.split('\n');// separa en lineas el documento
   let arrayLinks = [];
-  for ( let i=0; line.length > i; i++) { 
+  for ( let i=0; line.length > i; i++) {
     const lineI = line[i];
-    const reguExpress = /\[([^\]]+)]\((https?:\/\/[^\s)]+)\)/g; // expresión regular que muestra el texto y los links 
-    const matchLinks = lineI.matchAll(reguExpress);// busca coincidencias 
-    const testMatch = reguExpress.test(lineI); // true o false 
+    const reguExpress = /\[([^\]]+)]\((https?:\/\/[^\s)]+)\)/g; // expresión regular que muestra el texto y los links
+    const matchLinks = lineI.matchAll(reguExpress);// busca coincidencias
+    const testMatch = reguExpress.test(lineI); // true o false
     if(testMatch) {
       for(const match of matchLinks) {
         var objMd = {
@@ -56,17 +52,17 @@ const readFolder = (folder, mdLinks) => {
           line: i + 1,
         }
       }arrayLinks.push(objMd);
-    } 
+    }
   }return arrayLinks;
 };
 
-// Función para leer un documento 
+// Función para leer un documento
 const readFile = (files, mdLinks) => {
-    const file = fs.readFileSync(files, 'utf8');//lee el archivo y lo devuelve 
+    const file = fs.readFileSync(files, 'utf8');//lee el archivo y lo devuelve
     mdLinks.push(...linksMd(file, files)); // spread operator
 };
 
-const totalLinks = [];
+// const totalLinks = [];
 
 const dirOMd = (routeTotal, totalLinks) => {
   if(isFolder ( routeTotal)) {
@@ -115,51 +111,32 @@ const validateOpt = (arrayLinks) => {
     return Promise.all(statusLink);
   };
 
-  dirOMd('./prueba',totalLinks);
-  // console.log(totalLinks);
-validateOpt(totalLinks)
-.then(result=>console.log(result))
-.catch(err=>console.log('This error corresponds to the validateOpt promise' + err))
-  
+//   dirOMd('./prueba',totalLinks);
+//   // console.log(totalLinks);
+// validateOpt(totalLinks)
+// .then(result=>console.log(result))
+// .catch(err=>console.log('This error corresponds to the validateOpt promise' + err))
 
-// const mdlinksFinder = (fullPath, options = { validate: false, stats: false }) => {
-//   return new Promise((resolve, reject) => {
-//       try {
-//           if (isMdFile(fullPath)) {
-//               let pathArray = [];
-//               if (typeof fullPath !== 'object') {
-//                   pathArray.push(fullPath);
-//               } else {
-//                   pathArray = fullPath;
-//               }
-//               pathArray.forEach((path) => {
-//                   fileReader(path, options).then(fileData => {
-//                     linksMd(fileData, options, path).then(linksData => {
-//                         if (options.validate && !options.stats) {
-//                           resolve(linksData);                           
-//                         } 
-//                         if(options.stats && !options.validate) {
-//                           const stats = validateOpt(linksData);
-//                         resolve(stats);
-//                         } 
-//                         if(options.validate && options.stats) {
-//                         const stats = validateOpt(linksData);
-//                           resolve(stats);
-//                         } 
-//                           resolve(linksData);
-//                       }).catch(e => console.log(e));
-//                   }).catch(e => console.log(e))
-//               })
-//           } else if (isFolder(fullPath)) {
-//             readFolder(fullPath, options).then(fileData => {
-//                 const pathJoin = path.join(`${fullPath}${path.sep}${fileData}`);
-//                   resolve(mdlinksFinder(pathJoin, options));
-//               }).catch(e => console.log(e));
-//           } else {
-//               resolve('Error: No existe ningun archivo formato md');
-//           }
-//       } catch (error) {
-//           reject(error);
-//       }
-//   });
-// };
+const mdLinks = (fullPath, options = { validate: false}) => {
+  return new Promise((resolve, reject) => {
+    let totalMdLinks = [];
+    dirOMd(fullPath, totalMdLinks);
+    if (totalMdLinks.length > 0) {
+      if (!options.validate ) {
+          resolve(validateOpt(totalMdLinks))
+          .then(r=>console.log(r))
+  }
+}else {
+      reject(new Error('couldn\'t find any link'));
+  }
+
+  }).catch((err) => { console.log('This is why totalMdLinks fails: ' + err)});
+};
+  mdLinks('./prueba/prueba1.md',{ validate: false}).then((results)=> {
+      console.log(results);
+      })
+
+      
+
+     
+      
