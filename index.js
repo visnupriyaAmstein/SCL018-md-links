@@ -2,6 +2,8 @@ import fetch from 'node-fetch';
 import path from 'path';
 import fs from 'fs';
 
+// export const userPath = process.argv[2];
+
 // Función solo si  es folder
 export const isFolder = (dirRoute) => {
   try {
@@ -23,7 +25,7 @@ export const isMdFile = (filesRoute) => {
 };
 
 // Función para poder leer un folder
-const readFolder = (folder, mdLinks) => {
+export const readFolder = (folder, mdLinks) => {
     const files = fs.readdirSync(folder);//lee el archivo y devuelve la matriz  con los nombres
     files.forEach(file => {
     const fullPath = path.join(folder, file);// une la ruta
@@ -35,7 +37,7 @@ const readFolder = (folder, mdLinks) => {
     });
 };
 
- const linksMd = (file, files) => {
+ export const linksMd = (file, files) => {
   const line = file.split('\n');// separa en lineas el documento
   let arrayLinks = [];
   for ( let i=0; line.length > i; i++) {
@@ -57,14 +59,14 @@ const readFolder = (folder, mdLinks) => {
 };
 
 // Función para leer un documento
-const readFile = (files, mdLinks) => {
+export const readFile = (files, mdLinks) => {
     const file = fs.readFileSync(files, 'utf8');//lee el archivo y lo devuelve
     mdLinks.push(...linksMd(file, files)); // spread operator
 };
 
 // const totalLinks = [];
 
-const dirOMd = (routeTotal, totalLinks) => {
+export const dirOMd = (routeTotal, totalLinks) => {
   if(isFolder ( routeTotal)) {
     readFolder(routeTotal, totalLinks);
   }else if(isMdFile(routeTotal)) {
@@ -77,7 +79,7 @@ const dirOMd = (routeTotal, totalLinks) => {
 //pathDelUser = process.argv[2]
 
 
-const validateOpt = (arrayLinks) => {
+export const validateOpt = (arrayLinks) => {
     const statusLink = arrayLinks.map((obj) =>
       fetch(obj.href)
       .then((res) => {
@@ -117,26 +119,9 @@ const validateOpt = (arrayLinks) => {
 // .then(result=>console.log(result))
 // .catch(err=>console.log('This error corresponds to the validateOpt promise' + err))
 
-const mdLinks = (fullPath, options = { validate: false}) => {
-  return new Promise((resolve, reject) => {
-    let totalMdLinks = [];
-    dirOMd(fullPath, totalMdLinks);
-    if (totalMdLinks.length > 0) {
-      if (!options.validate ) {
-          resolve(validateOpt(totalMdLinks))
-          .then(r=>console.log(r))
-  }
-}else {
-      reject(new Error('couldn\'t find any link'));
-  }
 
-  }).catch((err) => { console.log('This is why totalMdLinks fails: ' + err)});
-};
-  mdLinks('./prueba/prueba1.md',{ validate: false}).then((results)=> {
-      console.log(results);
-      })
 
-      
+  // export {dirOMd,validateOpt,userPath};
 
      
       
