@@ -21,12 +21,17 @@ Para dar comienzo a la instalación de la librería , deberas contar con [Node.j
 
 ```js
 npm i vpriya-md-links
+```
+![foto1](https://github.com/visnupriyaAmstein/SCL018-md-links/blob/main/images/instalar.png?raw=true)
 
 
+## 3. Guía de uso de Md-links
 
-## 3. Objetivos de aprendizaje
+ya instalada nuesta librería deberas escribir en la terminal nuestro comando junto con la carpeta que quieres analizar .
 
-Reflexiona y luego marca los objetivos que has llegado a entender y aplicar en tu proyecto. Piensa en eso al decidir tu estrategia de trabajo.
+```js
+node md-links.js carpeta o archivo.md --validate
+```
 
 ### JavaScript
 
