@@ -1,6 +1,7 @@
 import {dirOMd,validateOpt} from './index.js';
 
 export const userPath = process.argv[2];
+//const option = Yargs(process.argv.slice(2)).argv;
 
 export const mdLinks = (fullPath, options = { validate: false}) => {
     return new Promise((resolve, reject) => {
@@ -17,6 +18,7 @@ export const mdLinks = (fullPath, options = { validate: false}) => {
   
     }).catch((err) => { console.log('This is why totalMdLinks fails: ' + err)});
   };
+
     mdLinks(userPath,{ validate: false}).then((results)=> {
         console.log(results);
   })
