@@ -30,10 +30,31 @@ npm i vpriya-md-links
 ya instalada nuesta librería deberas escribir en la terminal nuestro comando junto con la carpeta que quieres analizar .
 
 ```js
-node md-links.js carpeta o archivo.md --validate
+$ node md-links.js carpeta o archivo.md --validate
 ```
+- [ ] **Opciones**
 
-### JavaScript
+--validate
+
+Al ejecutar nuestro comando podremos visualizar el estado de los links con su status http , si es ok (200) o fail (404).
+
+## 4. Organización en diagramde de flujo
+
+Este será el flujo que realizara el archivo o carpeta que deseamos testear .
+
+![foto2](https://github.com/visnupriyaAmstein/SCL018-md-links/blob/main/images/diagrama.png?raw=true)
+
+## 5. visualización en la terminal
+
+Ejemplo del uso de la Librería 
+
+![foto3](https://github.com/visnupriyaAmstein/SCL018-md-links/blob/main/images/terminal.png?raw=true)
+
+
+Creado por Visnupriya Amstein .
+
+
+
 
 - [ ] **Diferenciar entre tipos de datos primitivos y no primitivos**
 
