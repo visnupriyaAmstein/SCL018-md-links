@@ -30,7 +30,7 @@ npm i vpriya-md-links
 ya instalada nuesta librería deberas escribir en la terminal nuestro comando junto con la carpeta que quieres analizar.
 
 ```js
-$ node md-links.js carpeta o archivo.md --validate
+$ md-links carpeta o archivo.md --validate
 ```
 ### Opciones
 

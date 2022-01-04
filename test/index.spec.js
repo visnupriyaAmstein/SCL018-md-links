@@ -32,6 +32,10 @@ describe('isMdFile', () => {
     const result = isMdFile('pruebas2.md');
     expect(result).toBeTruthy();
     });
+    it('should return false', () => {
+      const result = isMdFile('./prueba');
+      expect(result).toBeFalsy();
+      });
 });
 describe('isFolder', () => {
     it('should be a function', () => {
@@ -42,5 +46,9 @@ describe('isFolder', () => {
         const result = isFolder('./prueba');
         expect(result).toBeTruthy();
     });
+    it('should return false', () => {
+      const result = isFolder('pruebas2.md');
+      expect(result).toBeFalsy();
+  });
     
 });

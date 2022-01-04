@@ -4,7 +4,7 @@ import fs from 'fs';
 
 // export const userPath = process.argv[2];
 
-// Función solo si  es folder
+// Función solo si  es folder (true)
 export const isFolder = (dirRoute) => {
   try {
       const stats = fs.statSync(dirRoute);//devuelve informacion sincronicamente sobre la ruta
@@ -20,7 +20,7 @@ export const isMdFile = (filesRoute) => {
     if (extName === '.md') {  // compara la ruta con md
         return true;
     } else {
-        console.log('No es un archivo .md')
+        console.log('El documento No contiene o No es un archivo .md')
     }
 };
 
